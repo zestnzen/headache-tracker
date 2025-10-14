@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Headache Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .date-display {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.3em;
+            color: #555;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .question {
+            margin-bottom: 30px;
+        }
+
+        .question-text {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .big-button {
+            flex: 1;
+            padding: 25px;
+            font-size: 1.5em;
+            font-weight: 700;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            color: white;
+        }
+
+        .big-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .big-button:active {
+            transform: translateY(0);
+        }
+
+        .yes-button {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .no-button {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .followup {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .followup.show {
+            display: block;
+        }
+
+        select {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        .emoji-scale {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .emoji-option {
+            flex: 1;
+            min-width: 80px;
+            padding: 15px;
+            text-align: center;
+            border: 3px solid #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .emoji-option:hover {
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .emoji-option.selected {
+            border-color: #667eea;
+            background: #f0f0ff;
+        }
+
+        .emoji-option .emoji {
+            font-size: 2em;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .emoji-option .label {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.5em;
+            font-weight: 700;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .submit-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .confirmation {
+            display: none;
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+            animation: fadeIn 0.5s;
+        }
+
+        .confirmation.show {
+            display: block;
+        }
+
+        .confirmation h2 {
+            color: white;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .confirmation p {
+            color: white;
+            font-size: 1.3em;
+        }
+
+        .history {
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 3px solid #eee;
+        }
+
+        .history h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .history-item {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+        }
+
+        .history-item.no-headache {
+            border-left-color: #4facfe;
+        }
+
+        .history-date {
+            font-weight: 700;
+            color: #333;
+            font-size: 1.2em;
+            margin-bottom: 8px;
+        }
+
+        .history-details {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .no-entries {
+            text-align: center;
+            color: #999;
+            font-size: 1.2em;
+            padding: 20px;
+        }
+
+        .reset-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #f5576c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .reset-button:hover {
+            background: #d43f52;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 Daily Headache Tracker</h1>
+        </div>
+
+        <div class="date-display" id="dateDisplay"></div>
+
+        <div class="question">
+            <div class="question-text">Did you have a headache today?</div>
+            <div class="button-group">
+                <button class="big-button yes-button" onclick="handleHeadacheResponse(true)">YES</button>
+                <button class="big-button no-button" onclick="handleHeadacheResponse(false)">NO</button>
+            </div>
+        </div>
+
+        <div class="followup" id="followup">
+            <div class="question">
+                <div class="question-text">When did it start?</div>
+                <select id="startTime">
+                    <option value="">Choose a time...</option>
+                    <option value="Morning">Morning</option>
+                    <option value="Afternoon">Afternoon</option>
+                    <option value="Evening">Evening</option>
+                    <option value="Night">Night</option>
+                </select>
+            </div>
+
+            <div class="question">
+                <div class="question-text">How bad was it?</div>
+                <div class="emoji-scale" id="intensityScale">
+                    <div class="emoji-option" data-value="1-3" onclick="selectIntensity(this)">
+                        <span class="emoji">😊</span>
+                        <span class="label">1-3</span>
+                    </div>
+                    <div class="emoji-option" data-value="4-6" onclick="selectIntensity(this)">
+                        <span class="emoji">😐</span>
+                        <span class="label">4-6</span>
+                    </div>
+                    <div class="emoji-option" data-value="7-9" onclick="selectIntensity(this)">
+                        <span class="emoji">😢</span>
+                        <span class="label">7-9</span>
+                    </div>
+                    <div class="emoji-option" data-value="10" onclick="selectIntensity(this)">
+                        <span class="emoji">😫</span>
+                        <span class="label">10</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="submit-button" id="submitButton" onclick="submitEntry()" disabled>Submit</button>
+
+        <div class="confirmation" id="confirmation">
+            <h2>🎉 Great job!</h2>
+            <p id="confirmationText"></p>
+        </div>
+
+        <div class="history">
+            <h2>📅 Past Entries</h2>
+            <div class="history-list" id="historyList">
+                <div class="no-entries">No entries yet. Start tracking today!</div>
+            </div>
+            <button class="reset-button" onclick="resetForm()">Add Another Entry</button>
+        </div>
+    </div>
+
+    <script>
+        let currentEntry = {
+            hasHeadache: null,
+            startTime: null,
+            intensity: null
+        };
+
+        function displayCurrentDate() {
+            const today = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('dateDisplay').textContent = today.toLocaleDateString('en-US', options);
+        }
+
+        function handleHeadacheResponse(hasHeadache) {
+            currentEntry.hasHeadache = hasHeadache;
+            const followup = document.getElementById('followup');
+            const submitButton = document.getElementById('submitButton');
+
+            if (hasHeadache) {
+                followup.classList.add('show');
+                submitButton.disabled = true;
+            } else {
+                followup.classList.remove('show');
+                submitButton.disabled = false;
+                currentEntry.startTime = null;
+                currentEntry.intensity = null;
+            }
+        }
+
+        function selectIntensity(element) {
+            document.querySelectorAll('.emoji-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            currentEntry.intensity = element.getAttribute('data-value');
+            checkSubmitEnabled();
+        }
+
+        function checkSubmitEnabled() {
+            const submitButton = document.getElementById('submitButton');
+            const startTime = document.getElementById('startTime').value;
+            
+            if (currentEntry.hasHeadache) {
+                submitButton.disabled = !(startTime && currentEntry.intensity);
+                currentEntry.startTime = startTime;
+            } else {
+                submitButton.disabled = false;
+            }
+        }
+
+        document.getElementById('startTime').addEventListener('change', checkSubmitEnabled);
+
+        function submitEntry() {
+            const entry = {
+                date: new Date().toISOString().split('T')[0],
+                hasHeadache: currentEntry.hasHeadache,
+                startTime: currentEntry.startTime,
+                intensity: currentEntry.intensity
+            };
+
+            // Get existing entries
+            let entries = JSON.parse(localStorage.getItem('headacheEntries') || '[]');
+            
+            // Check if entry for today already exists
+            const existingIndex = entries.findIndex(e => e.date === entry.date);
+            if (existingIndex !== -1) {
+                entries[existingIndex] = entry;
+            } else {
+                entries.push(entry);
+            }
+            
+            localStorage.setItem('headacheEntries', JSON.stringify(entries));
+
+            // Show confirmation
+            const confirmation = document.getElementById('confirmation');
+            const confirmationText = document.getElementById('confirmationText');
+            const today = new Date();
+            confirmationText.textContent = `Entry saved for ${today.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}!`;
+            confirmation.classList.add('show');
+
+            // Disable form
+            document.querySelectorAll('.big-button').forEach(btn => btn.disabled = true);
+            document.getElementById('submitButton').disabled = true;
+
+            // Refresh history
+            displayHistory();
+        }
+
+        function displayHistory() {
+            const entries = JSON.parse(localStorage.getItem('headacheEntries') || '[]');
+            const historyList = document.getElementById('historyList');
+
+            if (entries.length === 0) {
+                historyList.innerHTML = '<div class="no-entries">No entries yet. Start tracking today!</div>';
+                return;
+            }
+
+            // Sort by date (newest first)
+            entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            historyList.innerHTML = entries.map(entry => {
+                const date = new Date(entry.date);
+                const formattedDate = date.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+
+                if (entry.hasHeadache) {
+                    return `
+                        <div class="history-item">
+                            <div class="history-date">${formattedDate}</div>
+                            <div class="history-details">
+                                ⚠️ Headache - Started: ${entry.startTime} - Intensity: ${entry.intensity}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="history-item no-headache">
+                            <div class="history-date">${formattedDate}</div>
+                            <div class="history-details">
+                                ✅ No headache
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
+
+        function resetForm() {
+            currentEntry = {
+                hasHeadache: null,
+                startTime: null,
+                intensity: null
+            };
+
+            document.getElementById('followup').classList.remove('show');
+            document.getElementById('confirmation').classList.remove('show');
+            document.getElementById('startTime').value = '';
+            document.querySelectorAll('.emoji-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            document.querySelectorAll('.big-button').forEach(btn => btn.disabled = false);
+            document.getElementById('submitButton').disabled = true;
+
+            displayCurrentDate();
+        }
+
+        // Initialize
+        displayCurrentDate();
+        displayHistory();
+    </script>
+</body>
+</html>
