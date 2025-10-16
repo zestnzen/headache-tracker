@@ -1017,16 +1017,32 @@
         }
 
         function displayUserList() {
+            console.log('--- displayUserList() START ---');
             const users = getUsers();
             const userList = document.getElementById('userList');
             
-            if (users.length === 0) {
-                userList.innerHTML = '<p style="color: #999;">No users yet. Add someone to get started!</p>';
-            } else {
-                userList.innerHTML = users.map(user => 
-                    `<button class="user-button" onclick="selectUser('${user}')">${user}</button>`
-                ).join('');
+            console.log('Users array:', users);
+            console.log('Users length:', users.length);
+            console.log('userList element:', userList);
+            
+            if (!userList) {
+                console.error('ERROR: userList element not found!');
+                return;
             }
+            
+            if (users.length === 0) {
+                console.log('No users, showing default message');
+                userList.innerHTML = '<p style="color: #666; font-size: 1.1em;">No users yet. Click "Add New Person" to get started!</p>';
+            } else {
+                console.log('Creating buttons for users:', users);
+                const buttonsHTML = users.map(user => 
+                    `<button class="user-button" onclick="selectUser('${user}'); return false;">${user}</button>`
+                ).join('');
+                console.log('Generated HTML:', buttonsHTML);
+                userList.innerHTML = buttonsHTML;
+                console.log('HTML inserted into userList');
+            }
+            console.log('--- displayUserList() END ---');
         }
 
         function addNewUser() {
@@ -1051,18 +1067,36 @@
         }
 
         function selectUser(userName) {
+            console.log('--- selectUser() START ---');
+            console.log('Selecting user:', userName);
+            
             currentUser = userName;
             localStorage.setItem('currentHeadacheUser', userName);
-            document.getElementById('currentUserName').textContent = userName;
-            document.getElementById('userSelectScreen').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
             
+            const currentUserNameEl = document.getElementById('currentUserName');
+            const userSelectScreen = document.getElementById('userSelectScreen');
+            const mainApp = document.getElementById('mainApp');
+            
+            console.log('currentUserName element:', currentUserNameEl);
+            console.log('userSelectScreen element:', userSelectScreen);
+            console.log('mainApp element:', mainApp);
+            
+            if (currentUserNameEl) currentUserNameEl.textContent = userName;
+            if (userSelectScreen) userSelectScreen.style.display = 'none';
+            if (mainApp) mainApp.style.display = 'block';
+            
+            console.log('Calling initializeEventListeners()');
             // Initialize event listeners now that the form is visible
             initializeEventListeners();
             
+            console.log('Calling updateDashboard()');
             // Refresh dashboard with user's data
             updateDashboard();
+            
+            console.log('Calling displayHistory()');
             displayHistory();
+            
+            console.log('--- selectUser() END ---');
         }
 
         function switchUser() {
@@ -1070,8 +1104,8 @@
             localStorage.removeItem('currentHeadacheUser');
             document.getElementById('userSelectScreen').style.display = 'flex';
             document.getElementById('mainApp').style.display = 'none';
-            displayUserList();
             resetForm();
+            displayUserList();
         }
 
         function getUserStorageKey() {
@@ -1079,14 +1113,31 @@
         }
 
         function checkForCurrentUser() {
+            console.log('--- checkForCurrentUser() START ---');
             const savedUser = localStorage.getItem('currentHeadacheUser');
             const users = getUsers();
             
+            console.log('Saved user from localStorage:', savedUser);
+            console.log('Users list:', users);
+            
             if (savedUser && users.includes(savedUser)) {
+                console.log('Found saved user, calling selectUser()');
                 selectUser(savedUser);
             } else {
+                console.log('No saved user, showing user selection screen');
+                // Show user selection screen and display user list
+                const userSelectScreen = document.getElementById('userSelectScreen');
+                const mainApp = document.getElementById('mainApp');
+                console.log('userSelectScreen element:', userSelectScreen);
+                console.log('mainApp element:', mainApp);
+                
+                if (userSelectScreen) userSelectScreen.style.display = 'flex';
+                if (mainApp) mainApp.style.display = 'none';
+                
+                console.log('Calling displayUserList()');
                 displayUserList();
             }
+            console.log('--- checkForCurrentUser() END ---');
         }
 
         function switchTab(tabName) {
@@ -1188,7 +1239,7 @@
             checkFormComplete();
         }
 
-        function checkFormComplete() {
+        function submitEntry() {
             const submitButton = document.getElementById('submitButton');
             
             let isComplete = currentEntry.hasHeadache !== null &&
@@ -1210,8 +1261,6 @@
             submitButton.disabled = !isComplete;
         }
 
-        document.getElementById('startTime').addEventListener('change', checkFormComplete);
-        document.getElementById('duration').addEventListener('change', checkFormComplete);
 
         document.querySelectorAll('#symptoms input[type="checkbox"]').forEach(checkbox => {
             checkbox.addEventListener('change', function() {
@@ -1898,6 +1947,10 @@
         // Initialize
         displayCurrentDate();
         updateDashboard();
+// Force display user list on load
+setTimeout(function() {
+    displayUserList();
+}, 500);
     </script>
 </body>
 </html>
