@@ -265,7 +265,6 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
 
-        /* All the existing V2 styles */
         .question {
             margin-bottom: 25px;
         }
@@ -339,15 +338,6 @@
             font-weight: 700;
             transform: scale(1.05);
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-
-        select {
-            width: 100%;
-            padding: 15px;
-            font-size: 1.1em;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            cursor: pointer;
         }
 
         .emoji-scale {
@@ -706,18 +696,16 @@
     </style>
 </head>
 <body>
-    <!-- User Selection Screen -->
     <div id="userSelectScreen" class="user-select-screen">
         <div class="user-select-card">
             <h2>👤 Who's tracking today?</h2>
             <p>Select your name to continue</p>
             <div class="user-list" id="userList"></div>
-            <button class="add-user-button" onclick="addNewUser(); return false;">➕ Add New Person</button>
+            <button class="add-user-button" onclick="addNewUser()">➕ Add New Person</button>
         </div>
     </div>
 
     <div class="container" id="mainApp" style="display: none;">
-        <!-- Current User Banner -->
         <div class="current-user-banner">
             <span>📊 Tracking for: <strong id="currentUserName"></strong></span>
             <button class="switch-user-button" onclick="switchUser()">Switch User</button>
@@ -728,14 +716,12 @@
             <span class="version-badge">Version 3 - Analytics</span>
         </div>
 
-        <!-- Navigation Tabs -->
         <div class="nav-tabs">
             <button class="nav-tab active" onclick="switchTab('dashboard')">📊 Dashboard</button>
             <button class="nav-tab" onclick="switchTab('log')">📝 Daily Tracker</button>
             <button class="nav-tab" onclick="switchTab('history')">📅 History</button>
         </div>
 
-        <!-- Dashboard Tab -->
         <div id="dashboardTab" class="tab-content active">
             <div id="encouragementBanner" class="encouragement-banner"></div>
 
@@ -781,7 +767,6 @@
             <button class="report-button" onclick="generateDoctorReport()">🏥 Generate Doctor Report</button>
         </div>
 
-        <!-- Log Entry Tab (Version 2 content) -->
         <div id="logTab" class="tab-content">
             <div class="date-display" id="dateDisplay"></div>
 
@@ -811,7 +796,7 @@
 
                     <div class="question">
                         <div class="question-text">How bad was it?</div>
-                        <div class="emoji-scale" id="intensityScale">
+                        <div class="emoji-scale">
                             <div class="emoji-option" data-value="1-3" onclick="selectIntensity(this)">
                                 <span class="emoji">😊</span>
                                 <span class="label">1-3</span>
@@ -973,7 +958,6 @@
             </div>
         </div>
 
-        <!-- History Tab -->
         <div id="historyTab" class="tab-content">
             <div class="section">
                 <div class="section-title">📅 All Entries</div>
@@ -1006,7 +990,6 @@
         let dayOfWeekChart = null;
         let triggerChart = null;
 
-        // User Management Functions
         function getUsers() {
             const users = localStorage.getItem('headacheTrackerUsers');
             return users ? JSON.parse(users) : [];
@@ -1017,41 +1000,23 @@
         }
 
         function displayUserList() {
-            console.log('--- displayUserList() START ---');
             const users = getUsers();
             const userList = document.getElementById('userList');
             
-            console.log('Users array:', users);
-            console.log('Users length:', users.length);
-            console.log('userList element:', userList);
-            
-            if (!userList) {
-                console.error('ERROR: userList element not found!');
-                return;
-            }
+            if (!userList) return;
             
             if (users.length === 0) {
-                console.log('No users, showing default message');
                 userList.innerHTML = '<p style="color: #666; font-size: 1.1em;">No users yet. Click "Add New Person" to get started!</p>';
             } else {
-                console.log('Creating buttons for users:', users);
-                const buttonsHTML = users.map(user => 
-                    `<button class="user-button" onclick="selectUser('${user}'); return false;">${user}</button>`
+                userList.innerHTML = users.map(user => 
+                    `<button class="user-button" onclick="selectUser('${user}')">${user}</button>`
                 ).join('');
-                console.log('Generated HTML:', buttonsHTML);
-                userList.innerHTML = buttonsHTML;
-                console.log('HTML inserted into userList');
             }
-            console.log('--- displayUserList() END ---');
         }
 
         function addNewUser() {
             const name = prompt('Enter a name for the new person:');
-            
-            // Check if user clicked Cancel or entered nothing
-            if (!name || name.trim() === '') {
-                return;
-            }
+            if (!name || name.trim() === '') return;
             
             const users = getUsers();
             const trimmedName = name.trim();
@@ -1067,36 +1032,18 @@
         }
 
         function selectUser(userName) {
-            console.log('--- selectUser() START ---');
-            console.log('Selecting user:', userName);
-            
             currentUser = userName;
             localStorage.setItem('currentHeadacheUser', userName);
             
             const currentUserNameEl = document.getElementById('currentUserName');
-            const userSelectScreen = document.getElementById('userSelectScreen');
-            const mainApp = document.getElementById('mainApp');
-            
-            console.log('currentUserName element:', currentUserNameEl);
-            console.log('userSelectScreen element:', userSelectScreen);
-            console.log('mainApp element:', mainApp);
-            
             if (currentUserNameEl) currentUserNameEl.textContent = userName;
-            if (userSelectScreen) userSelectScreen.style.display = 'none';
-            if (mainApp) mainApp.style.display = 'block';
             
-            console.log('Calling initializeEventListeners()');
-            // Initialize event listeners now that the form is visible
+            document.getElementById('userSelectScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            
             initializeEventListeners();
-            
-            console.log('Calling updateDashboard()');
-            // Refresh dashboard with user's data
             updateDashboard();
-            
-            console.log('Calling displayHistory()');
             displayHistory();
-            
-            console.log('--- selectUser() END ---');
         }
 
         function switchUser() {
@@ -1104,8 +1051,8 @@
             localStorage.removeItem('currentHeadacheUser');
             document.getElementById('userSelectScreen').style.display = 'flex';
             document.getElementById('mainApp').style.display = 'none';
-            resetForm();
             displayUserList();
+            resetForm();
         }
 
         function getUserStorageKey() {
@@ -1113,43 +1060,22 @@
         }
 
         function checkForCurrentUser() {
-            console.log('--- checkForCurrentUser() START ---');
             const savedUser = localStorage.getItem('currentHeadacheUser');
             const users = getUsers();
             
-            console.log('Saved user from localStorage:', savedUser);
-            console.log('Users list:', users);
-            
             if (savedUser && users.includes(savedUser)) {
-                console.log('Found saved user, calling selectUser()');
                 selectUser(savedUser);
             } else {
-                console.log('No saved user, showing user selection screen');
-                // Show user selection screen and display user list
-                const userSelectScreen = document.getElementById('userSelectScreen');
-                const mainApp = document.getElementById('mainApp');
-                console.log('userSelectScreen element:', userSelectScreen);
-                console.log('mainApp element:', mainApp);
-                
-                if (userSelectScreen) userSelectScreen.style.display = 'flex';
-                if (mainApp) mainApp.style.display = 'none';
-                
-                console.log('Calling displayUserList()');
+                document.getElementById('userSelectScreen').style.display = 'flex';
+                document.getElementById('mainApp').style.display = 'none';
                 displayUserList();
             }
-            console.log('--- checkForCurrentUser() END ---');
         }
 
         function switchTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
 
-            // Show selected tab
             if (tabName === 'dashboard') {
                 document.getElementById('dashboardTab').classList.add('active');
                 document.querySelectorAll('.nav-tab')[0].classList.add('active');
@@ -1167,24 +1093,24 @@
         function displayCurrentDate() {
             const today = new Date();
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('dateDisplay').textContent = today.toLocaleDateString('en-US', options);
+            const dateEl = document.getElementById('dateDisplay');
+            if (dateEl) dateEl.textContent = today.toLocaleDateString('en-US', options);
         }
 
         function handleHeadacheResponse(hasHeadache) {
             currentEntry.hasHeadache = hasHeadache;
             const headacheDetails = document.getElementById('headacheDetails');
-
-            const yesButton = document.querySelectorAll('.yes-button')[0];
-            const noButton = document.querySelectorAll('.no-button')[0];
-            yesButton.classList.remove('selected');
-            noButton.classList.remove('selected');
+            const yesButtons = document.querySelectorAll('.yes-button');
+            const noButtons = document.querySelectorAll('.no-button');
+            
+            yesButtons.forEach(btn => btn.classList.remove('selected'));
+            noButtons.forEach(btn => btn.classList.remove('selected'));
             
             if (hasHeadache) {
-                yesButton.classList.add('selected');
+                yesButtons[0].classList.add('selected');
                 headacheDetails.classList.remove('hidden');
-                headacheDetails.classList.add('show');
             } else {
-                noButton.classList.add('selected');
+                noButtons[0].classList.add('selected');
                 headacheDetails.classList.add('hidden');
                 currentEntry.startTime = null;
                 currentEntry.intensity = null;
@@ -1193,10 +1119,8 @@
                 currentEntry.symptoms = [];
                 
                 setTimeout(() => {
-                    document.querySelector('.section:nth-of-type(3)').scrollIntoView({ 
-                        behavior: 'smooth', 
-                        block: 'start' 
-                    });
+                    const dailySection = document.querySelector('#logTab .section:last-of-type');
+                    if (dailySection) dailySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }, 100);
             }
             
@@ -1221,8 +1145,15 @@
                 } else {
                     currentEntry[category].push(value);
                 }
+            } else if (category === 'startTime' || category === 'duration') {
+                const siblings = element.parentElement.querySelectorAll('.option-button');
+                siblings.forEach(sib => sib.classList.remove('selected'));
+                element.classList.add('selected');
+                const text = element.textContent.trim();
+                const cleanText = text.substring(text.indexOf(' ') + 1);
+                currentEntry[category] = cleanText;
             } else {
-                const siblings = element.parentElement.querySelectorAll('.option-button, .big-button, .water-option');
+                const siblings = element.parentElement.querySelectorAll('.option-button, .water-option');
                 siblings.forEach(sib => sib.classList.remove('selected'));
                 element.classList.add('selected');
                 currentEntry[category] = element.textContent.trim();
@@ -1231,16 +1162,15 @@
         }
 
         function selectIntensity(element) {
-            document.querySelectorAll('.emoji-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
+            document.querySelectorAll('.emoji-option').forEach(opt => opt.classList.remove('selected'));
             element.classList.add('selected');
             currentEntry.intensity = element.getAttribute('data-value');
             checkFormComplete();
         }
 
-        function submitEntry() {
+        function checkFormComplete() {
             const submitButton = document.getElementById('submitButton');
+            if (!submitButton) return;
             
             let isComplete = currentEntry.hasHeadache !== null &&
                            currentEntry.weather !== null &&
@@ -1261,21 +1191,26 @@
             submitButton.disabled = !isComplete;
         }
 
+        function initializeEventListeners() {
+            setTimeout(function() {
+                const symptomsCheckboxes = document.querySelectorAll('#symptoms input[type="checkbox"]');
+                symptomsCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        currentEntry.symptoms = Array.from(document.querySelectorAll('#symptoms input:checked'))
+                            .map(cb => cb.value);
+                    });
+                });
 
-        document.querySelectorAll('#symptoms input[type="checkbox"]').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                currentEntry.symptoms = Array.from(document.querySelectorAll('#symptoms input:checked'))
-                    .map(cb => cb.value);
-            });
-        });
-
-        document.querySelectorAll('input[type="checkbox"][id^="meal"]').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                currentEntry.meals = Array.from(document.querySelectorAll('input[type="checkbox"][id^="meal"]:checked'))
-                    .map(cb => cb.value);
-                checkFormComplete();
-            });
-        });
+                const mealCheckboxes = document.querySelectorAll('input[type="checkbox"][id^="meal"]');
+                mealCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        currentEntry.meals = Array.from(document.querySelectorAll('input[type="checkbox"][id^="meal"]:checked'))
+                            .map(cb => cb.value);
+                        checkFormComplete();
+                    });
+                });
+            }, 100);
+        }
 
         function submitEntry() {
             const today = new Date();
@@ -1284,15 +1219,10 @@
             const day = String(today.getDate()).padStart(2, '0');
             const dateStr = `${year}-${month}-${day}`;
             
-            // Ensure meals array is populated from checkboxes at submission time
             currentEntry.meals = Array.from(document.querySelectorAll('input[type="checkbox"][id^="meal"]:checked'))
                 .map(cb => cb.value);
             
-            const entry = {
-                date: dateStr,
-                ...currentEntry
-            };
-
+            const entry = { date: dateStr, ...currentEntry };
             let entries = JSON.parse(localStorage.getItem(getUserStorageKey()) || '[]');
             
             const existingIndex = entries.findIndex(e => e.date === dateStr);
@@ -1310,7 +1240,8 @@
             confirmation.classList.add('show');
 
             document.querySelectorAll('button').forEach(btn => {
-                if (!btn.classList.contains('reset-button') && !btn.classList.contains('nav-tab') && !btn.classList.contains('report-button')) {
+                if (!btn.classList.contains('reset-button') && !btn.classList.contains('nav-tab') && 
+                    !btn.classList.contains('report-button') && !btn.classList.contains('switch-user-button')) {
                     btn.disabled = true;
                 }
             });
@@ -1324,6 +1255,7 @@
         function displayHistory() {
             const entries = JSON.parse(localStorage.getItem(getUserStorageKey()) || '[]');
             const historyList = document.getElementById('historyList');
+            if (!historyList) return;
 
             if (entries.length === 0) {
                 historyList.innerHTML = '<div class="no-entries">No entries yet. Start tracking today!</div>';
@@ -1333,21 +1265,16 @@
             entries.sort((a, b) => new Date(b.date) - new Date(a.date));
 
             historyList.innerHTML = entries.map(entry => {
-                // Parse date correctly to avoid timezone issues
                 const [year, month, day] = entry.date.split('-');
                 const date = new Date(year, month - 1, day);
                 const formattedDate = date.toLocaleDateString('en-US', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
                 });
 
                 let intensityClass = 'no-headache';
                 if (entry.hasHeadache) {
-                    const intensityValue = entry.intensity;
-                    if (intensityValue === '1-3') intensityClass = 'intensity-low';
-                    else if (intensityValue === '4-6') intensityClass = 'intensity-medium';
+                    if (entry.intensity === '1-3') intensityClass = 'intensity-low';
+                    else if (entry.intensity === '4-6') intensityClass = 'intensity-medium';
                     else intensityClass = 'intensity-high';
                 }
 
@@ -1363,7 +1290,7 @@
                         <div><span class="history-label">Location:</span>${entry.location.join(', ')}</div>
                         <div><span class="history-label">Duration:</span>${entry.duration}</div>`;
                     
-                    if (entry.symptoms.length > 0) {
+                    if (entry.symptoms && entry.symptoms.length > 0) {
                         html += `<div><span class="history-label">Symptoms:</span>${entry.symptoms.join(', ')}</div>`;
                     }
                 } else {
@@ -1408,8 +1335,12 @@
                 sleep: null
             };
 
-            document.getElementById('headacheDetails').classList.add('hidden');
-            document.getElementById('confirmation').classList.remove('show');
+            const headacheDetails = document.getElementById('headacheDetails');
+            const confirmation = document.getElementById('confirmation');
+            const submitButton = document.getElementById('submitButton');
+            
+            if (headacheDetails) headacheDetails.classList.add('hidden');
+            if (confirmation) confirmation.classList.remove('show');
             
             document.querySelectorAll('.emoji-option, .option-button, .big-button, .water-option').forEach(el => {
                 el.classList.remove('selected');
@@ -1417,8 +1348,8 @@
             
             document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
             document.querySelectorAll('button').forEach(btn => btn.disabled = false);
-            document.getElementById('submitButton').disabled = true;
-
+            
+            if (submitButton) submitButton.disabled = true;
             displayCurrentDate();
         }
 
@@ -1426,15 +1357,15 @@
             const entries = JSON.parse(localStorage.getItem(getUserStorageKey()) || '[]');
             
             if (entries.length === 0) {
-                document.getElementById('encouragementBanner').textContent = "Start tracking to see your patterns! 🌟";
+                const banner = document.getElementById('encouragementBanner');
+                if (banner) banner.textContent = "Start tracking to see your patterns! 🌟";
                 return;
             }
 
             const today = new Date();
             const thisMonth = entries.filter(e => {
-                const entryDate = new Date(e.date);
-                return entryDate.getMonth() === today.getMonth() && 
-                       entryDate.getFullYear() === today.getFullYear();
+                const [year, month] = e.date.split('-');
+                return parseInt(month) === today.getMonth() + 1 && parseInt(year) === today.getFullYear();
             });
 
             const headacheDays = thisMonth.filter(e => e.hasHeadache).length;
@@ -1457,22 +1388,24 @@
                 streakDays++;
             }
 
-            document.getElementById('totalHeadaches').textContent = headacheDays;
-            document.getElementById('headacheFree').textContent = headacheFreeDays;
-            document.getElementById('avgIntensity').textContent = avgIntensity;
-            document.getElementById('streakDays').textContent = streakDays;
+            const totalHeadachesEl = document.getElementById('totalHeadaches');
+            const headacheFreeEl = document.getElementById('headacheFree');
+            const avgIntensityEl = document.getElementById('avgIntensity');
+            const streakDaysEl = document.getElementById('streakDays');
+            
+            if (totalHeadachesEl) totalHeadachesEl.textContent = headacheDays;
+            if (headacheFreeEl) headacheFreeEl.textContent = headacheFreeDays;
+            if (avgIntensityEl) avgIntensityEl.textContent = avgIntensity;
+            if (streakDaysEl) streakDaysEl.textContent = streakDays;
 
             let encouragement = "";
-            if (streakDays === 0) {
-                encouragement = "Keep tracking! You're learning about your patterns 📊";
-            } else if (streakDays === 1) {
-                encouragement = "1 day without a headache - great! 🎉";
-            } else if (streakDays < 5) {
-                encouragement = `${streakDays} days without a headache - keep it up! 🌟`;
-            } else {
-                encouragement = `Amazing! ${streakDays} days headache-free! 🎊`;
-            }
-            document.getElementById('encouragementBanner').textContent = encouragement;
+            if (streakDays === 0) encouragement = "Keep tracking! You're learning about your patterns 📊";
+            else if (streakDays === 1) encouragement = "1 day without a headache - great! 🎉";
+            else if (streakDays < 5) encouragement = `${streakDays} days without a headache - keep it up! 🌟`;
+            else encouragement = `Amazing! ${streakDays} days headache-free! 🎊`;
+            
+            const banner = document.getElementById('encouragementBanner');
+            if (banner) banner.textContent = encouragement;
 
             generateCalendar(entries);
             generateInsights(entries);
@@ -1490,14 +1423,11 @@
             const startDayOfWeek = firstDay.getDay();
 
             const entryMap = {};
-            entries.forEach(e => {
-                entryMap[e.date] = e;
-            });
+            entries.forEach(e => entryMap[e.date] = e);
 
             let html = '<div class="calendar-grid">';
             
-            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            dayNames.forEach(day => {
+            ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
                 html += `<div class="calendar-header">${day}</div>`;
             });
 
@@ -1528,11 +1458,13 @@
             }
             
             html += '</div>';
-            document.getElementById('calendarView').innerHTML = html;
+            const calendarView = document.getElementById('calendarView');
+            if (calendarView) calendarView.innerHTML = html;
         }
 
         function generateInsights(entries) {
             const container = document.getElementById('insightsContainer');
+            if (!container) return;
             
             if (entries.length < 3) {
                 container.innerHTML = '<div class="insight-card"><span class="insight-text">Keep tracking for a few more days to see patterns!</span></div>';
@@ -1541,10 +1473,8 @@
 
             const headacheDays = entries.filter(e => e.hasHeadache);
             const noHeadacheDays = entries.filter(e => !e.hasHeadache);
-
             let insights = [];
 
-            // Water analysis
             const headacheWithoutWater = headacheDays.filter(e => e.water && e.water.includes('❌')).length;
             const headacheWithWater = headacheDays.filter(e => e.water && e.water.includes('💧')).length;
             if (headacheWithoutWater > headacheWithWater) {
@@ -1554,33 +1484,22 @@
                 });
             }
 
-            // Exercise analysis
             const headacheWithExercise = headacheDays.filter(e => e.exercise === 'YES').length;
             const noHeadacheWithExercise = noHeadacheDays.filter(e => e.exercise === 'YES').length;
             if (noHeadacheWithExercise > headacheWithExercise && headacheDays.length > 0) {
-                insights.push({
-                    icon: '🏃',
-                    text: 'On days you exercised, you had fewer headaches'
-                });
+                insights.push({ icon: '🏃', text: 'On days you exercised, you had fewer headaches' });
             }
 
-            // Sleep analysis
             const headacheWithBadSleep = headacheDays.filter(e => e.sleep && e.sleep.includes('Not good')).length;
             if (headacheWithBadSleep > headacheDays.length / 2 && headacheDays.length > 2) {
-                insights.push({
-                    icon: '😴',
-                    text: 'Poor sleep seems connected to your headaches'
-                });
+                insights.push({ icon: '😴', text: 'Poor sleep seems connected to your headaches' });
             }
 
-            // Most common location
             if (headacheDays.length > 0) {
                 const locations = {};
                 headacheDays.forEach(e => {
                     if (e.location && e.location.length > 0) {
-                        e.location.forEach(loc => {
-                            locations[loc] = (locations[loc] || 0) + 1;
-                        });
+                        e.location.forEach(loc => locations[loc] = (locations[loc] || 0) + 1);
                     }
                 });
                 const mostCommonLocation = Object.keys(locations).reduce((a, b) => locations[a] > locations[b] ? a : b, '');
@@ -1590,15 +1509,10 @@
                         text: `Your headaches are usually in the ${mostCommonLocation.toLowerCase()} of your head`
                     });
                 }
-            }
 
-            // Most common time
-            if (headacheDays.length > 0) {
                 const times = {};
                 headacheDays.forEach(e => {
-                    if (e.startTime) {
-                        times[e.startTime] = (times[e.startTime] || 0) + 1;
-                    }
+                    if (e.startTime) times[e.startTime] = (times[e.startTime] || 0) + 1;
                 });
                 const mostCommonTime = Object.keys(times).reduce((a, b) => times[a] > times[b] ? a : b, '');
                 if (mostCommonTime) {
@@ -1609,7 +1523,6 @@
                 }
             }
 
-            // Mood analysis
             const headacheWithStress = headacheDays.filter(e => 
                 e.mood && (e.mood.includes('😰 Worried/Stressed') || e.mood.includes('😠 Angry'))
             ).length;
@@ -1633,19 +1546,21 @@
         }
 
         function createCharts(entries) {
-            // Day of week chart
             const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
             const dayCounts = [0, 0, 0, 0, 0, 0, 0];
             
             entries.filter(e => e.hasHeadache).forEach(e => {
-                const date = new Date(e.date);
+                const [year, month, day] = e.date.split('-');
+                const date = new Date(year, month - 1, day);
                 dayCounts[date.getDay()]++;
             });
 
-            const ctx1 = document.getElementById('dayOfWeekChart').getContext('2d');
+            const ctx1 = document.getElementById('dayOfWeekChart');
+            if (!ctx1) return;
+            
             if (dayOfWeekChart) dayOfWeekChart.destroy();
             
-            dayOfWeekChart = new Chart(ctx1, {
+            dayOfWeekChart = new Chart(ctx1.getContext('2d'), {
                 type: 'bar',
                 data: {
                     labels: dayNames,
@@ -1663,15 +1578,12 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
-                            }
+                            ticks: { stepSize: 1 }
                         }
                     }
                 }
             });
 
-            // Trigger comparison chart
             const headacheDays = entries.filter(e => e.hasHeadache);
             const noHeadacheDays = entries.filter(e => !e.hasHeadache);
 
@@ -1694,10 +1606,12 @@
                 ]
             };
 
-            const ctx2 = document.getElementById('triggerChart').getContext('2d');
+            const ctx2 = document.getElementById('triggerChart');
+            if (!ctx2) return;
+            
             if (triggerChart) triggerChart.destroy();
 
-            triggerChart = new Chart(ctx2, {
+            triggerChart = new Chart(ctx2.getContext('2d'), {
                 type: 'bar',
                 data: {
                     labels: Object.keys(triggers),
@@ -1721,9 +1635,7 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
-                            }
+                            ticks: { stepSize: 1 }
                         }
                     }
                 }
@@ -1740,7 +1652,6 @@
 
             entries.sort((a, b) => new Date(a.date) - new Date(b.date));
             
-            // Parse dates correctly to avoid timezone issues
             const [startYear, startMonth, startDay] = entries[0].date.split('-');
             const startDate = new Date(startYear, startMonth - 1, startDay);
             const startDateFormatted = startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
@@ -1764,9 +1675,7 @@
             const locations = {};
             headacheDays.forEach(e => {
                 if (e.location && e.location.length > 0) {
-                    e.location.forEach(loc => {
-                        locations[loc] = (locations[loc] || 0) + 1;
-                    });
+                    e.location.forEach(loc => locations[loc] = (locations[loc] || 0) + 1);
                 }
             });
             const mostCommonLocation = Object.keys(locations).length > 0 
@@ -1775,9 +1684,7 @@
 
             const durations = {};
             headacheDays.forEach(e => {
-                if (e.duration) {
-                    durations[e.duration] = (durations[e.duration] || 0) + 1;
-                }
+                if (e.duration) durations[e.duration] = (durations[e.duration] || 0) + 1;
             });
             const mostCommonDuration = Object.keys(durations).length > 0
                 ? Object.keys(durations).reduce((a, b) => durations[a] > durations[b] ? a : b)
@@ -1785,26 +1692,22 @@
 
             const triggers = [];
             const headacheWithoutWater = headacheDays.filter(e => e.water && e.water.includes('❌')).length;
-            if (headacheWithoutWater > totalHeadaches / 2) {
-                triggers.push('Inadequate water intake');
-            }
+            if (headacheWithoutWater > totalHeadaches / 2) triggers.push('Inadequate water intake');
+            
             const headacheWithBadSleep = headacheDays.filter(e => e.sleep && e.sleep.includes('Not good')).length;
-            if (headacheWithBadSleep > totalHeadaches / 2) {
-                triggers.push('Poor sleep quality');
-            }
+            if (headacheWithBadSleep > totalHeadaches / 2) triggers.push('Poor sleep quality');
+            
             const headacheWithStress = headacheDays.filter(e => 
                 e.mood && (e.mood.includes('😰 Worried/Stressed') || e.mood.includes('😠 Angry'))
             ).length;
-            if (headacheWithStress > totalHeadaches / 2) {
-                triggers.push('Stress and emotional distress');
-            }
+            if (headacheWithStress > totalHeadaches / 2) triggers.push('Stress and emotional distress');
 
             const reportWindow = window.open('', '_blank');
             reportWindow.document.write(`
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>Headache Tracking Report</title>
+                    <title>Headache Tracking Report - ${currentUser}</title>
                     <style>
                         body {
                             font-family: Arial, sans-serif;
@@ -1861,14 +1764,12 @@
                             cursor: pointer;
                         }
                         @media print {
-                            .no-print {
-                                display: none;
-                            }
+                            .no-print { display: none; }
                         }
                     </style>
                 </head>
                 <body>
-                    <h1>📋 Headache Tracking Report</h1>
+                    <h1>📋 Headache Tracking Report - ${currentUser}</h1>
                     
                     <p><strong>Tracking Period:</strong> ${startDateFormatted} to ${endDateFormatted}</p>
                     <p><strong>Total Days Tracked:</strong> ${entries.length}</p>
@@ -1905,10 +1806,7 @@
                             const [year, month, day] = entry.date.split('-');
                             const date = new Date(year, month - 1, day);
                             const formattedDate = date.toLocaleDateString('en-US', { 
-                                weekday: 'long', 
-                                year: 'numeric', 
-                                month: 'long', 
-                                day: 'numeric' 
+                                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
                             });
                             return `
                                 <div class="entry-item">
@@ -1918,8 +1816,7 @@
                                     <strong>Duration:</strong> ${entry.duration}<br>
                                     <strong>Started:</strong> ${entry.startTime}<br>
                                     ${entry.symptoms && entry.symptoms.length > 0 
-                                        ? `<strong>Symptoms:</strong> ${entry.symptoms.join(', ')}<br>`
-                                        : ''
+                                        ? `<strong>Symptoms:</strong> ${entry.symptoms.join(', ')}<br>` : ''
                                     }
                                     <strong>Water Intake:</strong> ${entry.water}<br>
                                     <strong>Sleep Quality:</strong> ${entry.sleep}<br>
@@ -1944,13 +1841,16 @@
             reportWindow.document.close();
         }
 
-        // Initialize
-        displayCurrentDate();
-        updateDashboard();
-// Force display user list on load
-setTimeout(function() {
-    displayUserList();
-}, 500);
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+
+        function init() {
+            displayCurrentDate();
+            checkForCurrentUser();
+        }
     </script>
 </body>
 </html>
